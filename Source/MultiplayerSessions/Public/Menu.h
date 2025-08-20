@@ -20,11 +20,11 @@ public:
 
 	// Set up a UI widget which shows the cursor. Perfect for main menus.
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup();
+	void MenuSetup(int32 NumberOfPublicConnections = 4,FString TypeOfMatch = FString(TEXT("FreeForAll")));
 
 protected:
 	virtual bool Initialize() override;
-	
+	virtual void NativeDestruct() override;
 	
 	private:
 
@@ -40,7 +40,13 @@ protected:
 	UFUNCTION()
 	void JoinButtonClicked();
 
+	// Remove widget and enable gameplay input mode
+	void MenuTearDown();
+
 	// The subsystem designed to handle all online session functionality
 	UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+
+	int32 NumPublicConnections{4};
+	FString MatchType{TEXT("FreeForAll")};
 	
 };
