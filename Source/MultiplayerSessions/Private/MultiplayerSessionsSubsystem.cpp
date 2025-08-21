@@ -49,6 +49,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	LastSessionSettings->bShouldAdvertise = true;
 	LastSessionSettings->bUsesPresence = true;
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	LastSessionSettings->bUseLobbiesIfAvailable = true; // Recommendation from a student in the comments of class 22
 
 	if (const UWorld* World = GetWorld())
 	{
