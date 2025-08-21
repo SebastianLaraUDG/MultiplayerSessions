@@ -58,6 +58,9 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 		                                     *LastSessionSettings))
 		{
 			SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+
+			// Broadcast our own custom delegate
+			MultiplayerOnCreateSessionComplete.Broadcast(false);
 		}
 	}
 }
@@ -88,8 +91,15 @@ void UMultiplayerSessionsSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bSuccess)
+void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+	if (SessionInterface)
+	{
+		// Remove delegate since creation was successful
+		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+	}
+	// Broadcast session was created successfully
+	MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
 void UMultiplayerSessionsSubsystem::OnFindSessionComplete(bool bSuccess)

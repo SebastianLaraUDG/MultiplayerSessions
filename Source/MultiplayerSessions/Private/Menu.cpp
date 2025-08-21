@@ -31,6 +31,12 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
 	{
 		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
 	}
+
+	// Bind callback
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
+	}
 }
 
 bool UMenu::Initialize()
@@ -72,10 +78,6 @@ void UMenu::HostButtonClicked()
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
-		if (UWorld* const World = GetWorld())
-		{
-			World->ServerTravel("/Game/Project/Maps/Lobby?listen"); // ERROR WARNING, problablemente aqui por la ruta
-		}
 	}
 }
 
@@ -100,6 +102,35 @@ void UMenu::MenuTearDown()
 			FInputModeGameOnly InputModeData;
 			PlayerController->SetInputMode(InputModeData);
 			PlayerController->SetShowMouseCursor(false);
+		}
+	}
+}
+
+void UMenu::OnCreateSession(bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1, 15.0f,
+				FColor::MakeRandomColor(),TEXT("Session created successfully")
+			);
+		}
+
+		if (UWorld* const World = GetWorld())
+		{
+			World->ServerTravel("/Game/Project/Maps/Lobby?listen"); // ERROR WARNING, problablemente aqui por la ruta
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1, 15.0f,
+				FColor::Red,TEXT("Failed to create session")
+			);
 		}
 	}
 }
