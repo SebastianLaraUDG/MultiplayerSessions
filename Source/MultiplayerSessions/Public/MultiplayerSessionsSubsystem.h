@@ -33,7 +33,7 @@ public:
 	// To handle session functionality. The Menu class will call these
 	//
 	void CreateSession(int32 NumPublicConnections,FString MatchType);
-	void FindSession(int32 MaxSearchResults);
+	void FindSessions(int32 MaxSearchResults);
 	void JoinSession(const FOnlineSessionSearchResult& SessionSearchResult);
 	void DestroySession();
 	void StartSession();
@@ -59,7 +59,7 @@ public:
 	// These don't need to be called outside this class.
 	//
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionComplete(bool bSuccess);
+	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type);
 	void OnDestroySessionComplete(FName SessionName, bool bSuccess);
 	void OnStartSessionComplete(FName SessionName, bool bSuccess);
@@ -67,9 +67,8 @@ public:
 	
 	private:
 	IOnlineSessionPtr SessionInterface;
-
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
-	
+	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 	
 	//
 	// To add to the Online Session Interface delegate list.

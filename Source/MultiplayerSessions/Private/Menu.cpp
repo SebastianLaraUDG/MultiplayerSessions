@@ -94,6 +94,11 @@ void UMenu::JoinButtonClicked()
 			FColor::MakeRandomColor(),TEXT("Join button clicked")
 		);
 	}
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->FindSessions(10000);	// A large number since we're using a steam popular devID
+		
+	}
 }
 
 void UMenu::MenuTearDown()
