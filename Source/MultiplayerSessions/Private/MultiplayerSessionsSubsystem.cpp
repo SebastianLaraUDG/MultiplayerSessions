@@ -44,13 +44,14 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	LastSessionSettings = MakeShareable(new FOnlineSessionSettings());
 	// Is LAN if steam subsystem is used, otherwise false
 	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false;
-	LastSessionSettings->NumPublicConnections = NumPublicConnections;
+	LastSessionSettings->NumPublicConnections = NumPublicConnections; // Number of connections for a particular session
 	LastSessionSettings->bAllowJoinViaPresence = true;
 	LastSessionSettings->bShouldAdvertise = true;
 	LastSessionSettings->bUsesPresence = true;
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	LastSessionSettings->bUseLobbiesIfAvailable = true; // Recommendation from a student in the comments of class 22
-
+	LastSessionSettings->BuildUniqueId = 1;
+	
 	if (const UWorld* World = GetWorld())
 	{
 		const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
