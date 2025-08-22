@@ -84,6 +84,7 @@ void UMenu::HostButtonClicked()
 			FColor::MakeRandomColor(),TEXT("Host button clicked")
 		);
 	}
+	HostButton->SetIsEnabled(false);
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
@@ -99,6 +100,7 @@ void UMenu::JoinButtonClicked()
 			FColor::MakeRandomColor(),TEXT("Join button clicked")
 		);
 	}
+	JoinButton->SetIsEnabled(false);
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->FindSessions(10000); // A large number since we're using a steam popular devID
@@ -145,6 +147,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 				FColor::Red,TEXT("Failed to create session")
 			);
 		}
+		HostButton->SetIsEnabled(true);
 	}
 }
 
@@ -164,6 +167,12 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResu
 			MultiplayerSessionsSubsystem->JoinSession(Result);
 			return;
 		}
+	}
+
+	// Enable the Join button again
+	if (!bWasSuccessful || SessionResults.Num() == 0)
+	{
+		JoinButton->SetIsEnabled(true);
 	}
 }
 
@@ -186,6 +195,11 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 				}
 			}
 		}
+	}
+
+	if (Result != EOnJoinSessionCompleteResult::Success)
+	{
+		JoinButton->SetIsEnabled(true);
 	}
 }
 
