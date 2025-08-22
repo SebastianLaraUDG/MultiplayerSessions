@@ -6,8 +6,10 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
 
-void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
+void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
 {
+	PathToLobby = FString::Printf(TEXT("%s?listen"), *LobbyPath);
+
 	NumPublicConnections = NumberOfPublicConnections;
 	MatchType = TypeOfMatch;
 
@@ -37,12 +39,14 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
-		MultiplayerSessionsSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this,&ThisClass::OnFindSessions);
-		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this,&ThisClass::OnJoinSession);
-		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this,&ThisClass::OnDestroySession);
-		MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this,&ThisClass::OnStartSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSessions);
+		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this, &ThisClass::OnJoinSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.
+		                              AddDynamic(this, &ThisClass::OnDestroySession);
+		MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::OnStartSession);
 	}
 }
+
 
 bool UMenu::Initialize()
 {
@@ -97,8 +101,7 @@ void UMenu::JoinButtonClicked()
 	}
 	if (MultiplayerSessionsSubsystem)
 	{
-		MultiplayerSessionsSubsystem->FindSessions(10000);	// A large number since we're using a steam popular devID
-		
+		MultiplayerSessionsSubsystem->FindSessions(10000); // A large number since we're using a steam popular devID
 	}
 }
 
@@ -130,7 +133,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 
 		if (UWorld* const World = GetWorld())
 		{
-			World->ServerTravel("/Game/Project/Maps/Lobby?listen"); // ERROR WARNING, problablemente aqui por la ruta
+			World->ServerTravel(PathToLobby);
 		}
 	}
 	else
@@ -151,8 +154,8 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResu
 	{
 		return;
 	}
-	
-	for (auto Result: SessionResults)
+
+	for (auto Result : SessionResults)
 	{
 		FString SettingsValue;
 		Result.Session.SessionSettings.Get(FName("MatchType"), SettingsValue);
@@ -173,13 +176,13 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 		if (SessionInterface.IsValid())
 		{
 			FString Address;
-			SessionInterface->GetResolvedConnectString(NAME_GameSession,Address);
+			SessionInterface->GetResolvedConnectString(NAME_GameSession, Address);
 
 			if (const UGameInstance* GameInstance = GetGameInstance())
 			{
 				if (APlayerController* PlayerController = GameInstance->GetFirstLocalPlayerController())
 				{
-					PlayerController->ClientTravel(Address,TRAVEL_Absolute);
+					PlayerController->ClientTravel(Address, TRAVEL_Absolute);
 				}
 			}
 		}
